@@ -1,0 +1,15 @@
+name: Ansible role CD
+run-name: Launch deployment for ansible role.
+
+on:
+  ## pull request review is submitted
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  approved:
+    ## pull request is approved
+    if: github.event.review.state == 'APPROVED'
+    runs-on: self-hosted
+    steps:
+      - run: echo "This PR was approved"

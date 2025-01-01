@@ -1,0 +1,115 @@
+name: Ansible role CICD on test
+run-name: Launch integration for ansible role on test.
+
+on:
+  push: 
+    branches: ["test"]
+    paths-ignore: ['**.md']
+  pull_request:
+    branches: ["test"]
+    paths-ignore: ['**.md']
+
+jobs:
+    ## ansible-lint (using python) only support ubuntu distrib
+    runs-on: ubuntu-latest
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v4
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v6
+
+      - name: getting secrets
+        if: failure()
+        uses: scaleway/action-scw-secret@v0
+        with:
+          secret-names: |
+            /TEAMS/MS_TEAMS_WEBHOOK_URI
+          access-key: ${{ secrets.SCW_ACCESS_KEY }}
+          secret-key: ${{ secrets.SCW_SECRET_KEY }}
+          default-project-id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+          default-organization-id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
+
+      - name: Failure Teams notification
+        if: failure()
+        id: TeamsFail
+        uses: toko-bifrost/ms-teams-deploy-card@master
+        with:
+          github-token: ${{ github.token }}
+          webhook-uri: ${{ env.MS_TEAMS_WEBHOOK_URI }}
+          show-on-start: false
+          card-layout-exit: complete
+          timezone: "Europe/Paris"
+
+  molecule:
+    needs: lint
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        config:
+          - image: "debian"
+            tag: "buster"
+          - image: "debian"
+            tag: "bullseye"
+          - image: "debian"
+            tag: "bookworm"
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v4
+        
+      - name: molecule
+        uses: robertdebock/molecule-action@6.0.1
+        with:
+          image: ${{ matrix.config.image }}
+          tag: ${{ matrix.config.tag }}
+
+      - name: getting secrets
+        if: failure()
+        uses: scaleway/action-scw-secret@v0
+        with:
+          secret-names: |
+            /TEAMS/MS_TEAMS_WEBHOOK_URI
+          access-key: ${{ secrets.SCW_ACCESS_KEY }}
+          secret-key: ${{ secrets.SCW_SECRET_KEY }}
+          default-project-id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+          default-organization-id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
+
+      - name: Failure Teams notification
+        if: failure()
+        id: TeamsFail
+        uses: toko-bifrost/ms-teams-deploy-card@master
+        with:
+          github-token: ${{ github.token }}
+          webhook-uri: ${{ env.MS_TEAMS_WEBHOOK_URI }}
+          show-on-start: false
+          card-layout-exit: complete
+          timezone: "Europe/Paris"
+
+  notify:
+    needs: [lint, molecule]
+    runs-on: self-hosted
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: getting secrets         
+        uses: scaleway/action-scw-secret@v0
+        with:
+          secret-names: |
+            /TEAMS/MS_TEAMS_WEBHOOK_URI
+          access-key: ${{ secrets.SCW_ACCESS_KEY }}
+          secret-key: ${{ secrets.SCW_SECRET_KEY }}
+          default-project-id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+          default-organization-id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
+
+      - name: Success Teams notification
+        # if: ${{ always() && contains(needs.*.result, 'failure') }}
+        id: TeamsSuccess
+        uses: toko-bifrost/ms-teams-deploy-card@master
+        with:
+          github-token: ${{ github.token }}
+          webhook-uri: ${{ env.MS_TEAMS_WEBHOOK_URI }}
+          show-on-start: false
+          card-layout-exit: cozy
+          timezone: "Europe/Paris"
