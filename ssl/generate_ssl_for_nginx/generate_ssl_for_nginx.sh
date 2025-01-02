@@ -136,11 +136,3 @@ else
     docker stop ${NGINX_CONTAINER_ID}
     error_exit "Fail to generate let's encrypt certificate for domain : '${DOMAIN_NAME}'"
 fi
-
-
-
-
-
-#docker run --rm -it -v /tmp/certbot/www:/var/www/certbot -v /tmp/certbot/certificates:/etc/letsencrypt/live/openproject.tinycompany.fr --entrypoint /bin/sh certbot/certbot:v3.0.1 
-
-#certonly --webroot -w /var/www/certbot -d openproject.tinycompany.fr --rsa-key-size 4096 --non-interactive --agree-tos --force-renewal --staging -m dreadper@gmail.com
