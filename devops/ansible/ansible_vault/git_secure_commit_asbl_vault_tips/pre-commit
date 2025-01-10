@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Define the directory to check
+DIRECTORY="host_vars/all"
+
+# Check for unencrypted variable files in the specified directory
+for file in $(git diff --cached --name-only | grep "^$DIRECTORY/.*\.yml$"); do
+    if grep -q 'ANSIBLE_VAULT;' "$file"; then
+        echo "File '$file' is encrypted."
+    else
+        echo "Error: File '$file' is not encrypted. Please encrypt it using ansible-vault before committing."
+        exit 1
+    fi
+done
+
+# If all checks pass, allow the commit
+exit 0
