@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Define the pattern for variable files (adjust as necessary)
+VARIABLE_FILES_PATTERN="*.yml"
+
+# Check for unencrypted variable files
+for file in $(git diff --cached --name-only | grep -E "$VARIABLE_FILES_PATTERN"); do
+    if grep -q 'ANSIBLE_VAULT;' "$file"; then
+        echo "File '$file' is encrypted."
+    else
+        echo "Error: File '$file' is not encrypted. Please encrypt it using ansible-vault before committing."
+        exit 1
+    fi
+done
+
+# If all checks pass, allow the commit
+exit 0
