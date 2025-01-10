@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Define the pattern for variable files (adjust as necessary)
-VARIABLE_FILES_PATTERN="*.yml"
+# Define the directory to check
+DIRECTORY="host_vars/all"
 
-# Check for unencrypted variable files
-for file in $(git diff --cached --name-only | grep -E "$VARIABLE_FILES_PATTERN"); do
+# Check for unencrypted variable files in the specified directory
+for file in $(git diff --cached --name-only | grep "^$DIRECTORY/.*\.yml$"); do
     if grep -q 'ANSIBLE_VAULT;' "$file"; then
         echo "File '$file' is encrypted."
     else
