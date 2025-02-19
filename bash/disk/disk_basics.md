@@ -101,9 +101,9 @@ On a disk which partition table is MBR type, we can find 3 partitions types :
 
 Inside the partition, a filesystem need to be created. It is use to organize data inside the partition.The filesystem help to locate at what place is located the desired data, it act like an index like for books.
 
-
 ## Sources : 
 
 - [Stack overflow post about how disk works](https://stackoverflow.com/questions/24429949/device-vs-partition-vs-file-system-vs-volume-how-do-these-concepts-relate-to-ea)
 - [Dell documentation about disks](https://www.dell.com/support/kbdoc/fr-fr/000131456/types-et-definitions-des-partitions-et-repertoires-linux-ubuntu)
 - [Ubuntu wiki about disk and partition](https://doc.ubuntu-fr.org/partitions)
+- [linux storage tutorial](https://embeddedprojects101.com/the-beginners-guide-to-linux-storage-configuration/)

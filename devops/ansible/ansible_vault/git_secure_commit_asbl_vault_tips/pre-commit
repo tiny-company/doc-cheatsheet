@@ -1,17 +1,42 @@
 #!/bin/bash
 
-# Define the directory to check
-DIRECTORY="host_vars/all"
+# ------------------------------------------------------------------
+# - Filename: asbl_check.sh
+# - Author : vsypo
+# - Dependency : none
+# - Description : script that check if ansible vars file are encrypted using ansible-vault and revert latest commit if clear vars files found
+# - Creation date : 2025-01-23
+# - Bash version : 5.2.15(1)-release
+# ------------------------------------------------------------------
 
-# Check for unencrypted variable files in the specified directory
-for file in $(git diff --cached --name-only | grep "^$DIRECTORY/.*\.yml$"); do
+set -e
+
+####################################################
+#                    Parameters
+####################################################
+
+## Define the directory to check
+DIRECTORY=${DIRECTORY:-"ansible/group_vars/all"}
+
+## color parameters
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+####################################################
+#                 Main function
+####################################################
+
+## Check for unencrypted variable files in the specified directory
+for file in $(find $DIRECTORY -name "*.yml"); do
     if grep -q 'ANSIBLE_VAULT;' "$file"; then
-        echo "File '$file' is encrypted."
+        echo -e "${GREEN}File '$file' is encrypted.${NC}"
     else
-        echo "Error: File '$file' is not encrypted. Please encrypt it using ansible-vault before committing."
+        echo -e "${RED}Error: File '$file' is not encrypted. Please encrypt it using ansible-vault before committing.${NC}"
+        echo -e "${RED}In order to prevent any sensitive vars leak, commit is rejected${NC}"
         exit 1
     fi
 done
 
-# If all checks pass, allow the commit
+## If all checks pass, return success code (0)
 exit 0
