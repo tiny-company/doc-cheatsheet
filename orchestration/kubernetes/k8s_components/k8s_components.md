@@ -1,14 +1,15 @@
 # kubernetes component
 
 - Master components :
-    - API server :
-    - Controller Manager : 
-    - etcd :
-    - scheduler component : 
+    - [API server](#api-server)
+    - [Controller Manager](#controller-manager)
+    - [etcd](#etcd)
+    - [scheduler component](#scheduler-component)
 
 - Nodes components :
-    - Kubelet
-    - kube-proxy
+    - [Kubelet](#kubelet)
+    - [kube-proxy](#kube-proxy)
+    - [container runtime](#cr-container-runtime)
 
 ![k8s_architecture](https://kubernetes.io/images/docs/kubernetes-cluster-architecture.svg)
 
