@@ -1,5 +1,7 @@
 # kubernetes component
 
+![K8s components and objects](https://www.magiccloudnet.com/kubespray/k8s.png)
+
 - Master components :
     - [API server](#api-server)
     - [Controller Manager](#controller-manager)
