@@ -22,7 +22,7 @@ ENV_FILE_NAME=.env
 ## logs parameters
 LOG_STD_OUTPUT=${LOG_STD_OUTPUT:-false}
 LOG_DIR=${LOG_DIR:-./}
-SCRIPT_NAME="${SCRIPT_NAME:-generate_ssl_for_nginx_script}.log"
+SCRIPT_NAME="${SCRIPT_NAME:-nginx_ssl_gen_script}.log"
 LOG_FILE=${LOG_DIR}/${SCRIPT_NAME}
 LOG_COLORED=${LOG_COLORED:-true}
 
@@ -36,7 +36,20 @@ CERTBOT_HOST_DATA_PATH=${CERTBOT_HOST_DATA_PATH:-/tmp/certbot/certificates}
 CERTBOT_HOST_WWW_PATH=${CERTBOT_HOST_WWW_PATH:-/tmp/certbot/www}
 CERTBOT_EMAIL=${CERTBOT_EMAIL:-}
 CERTBOT_STAGING=${CERTBOT_STAGING:-1} # Set to 1 if you're testing your setup to avoid hitting request limits
+CERTBOT_STAGING_ARG=${CERTBOT_STAGING_ARG:-}
 CERTBOT_IMAGE_VERSION=${CERTBOT_IMAGE_VERSION:-v3.0.1}
+
+####################################################
+#                    ENV var loading
+####################################################
+
+## Load environment variables from .env file if file exist
+if [ -f ${ENV_FILE_NAME} ]; then 
+    source ${ENV_FILE_NAME}
+else 
+    echo "error environment file '${ENV_FILE_NAME}' not found"
+    exit 1
+fi
 
 ####################################################
 #                    Dependencies
@@ -64,13 +77,6 @@ checkMandatoryVariable() {
 ####################################################
 
 validate_log_path
-
-## Load environment variables from .env file if file exist
-if [ -f ${ENV_FILE_NAME} ]; then 
-    source ${ENV_FILE_NAME}
-else 
-    error_exit "error environment file '${ENV_FILE_NAME}' not found"
-fi
 
 ## check mandatory var
 checkMandatoryVariable ${MANDATORY_VAR_LIST} || error_exit "mandatory variable not defined, see errors above"
